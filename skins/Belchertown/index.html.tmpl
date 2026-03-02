@@ -512,6 +512,10 @@
                                     <td><b>$obs.label.snapshot_high:</b></td>    <td><span class="dailystatshigh">$day.outTemp.max</span></td><!-- AJAX -->
                                     <td><b>$obs.label.snapshot_low:</b></td>    <td><span class="dailystatslow">$day.outTemp.min</span></td><!-- AJAX -->
                                 </tr>
+								<tr>
+                                    <td><b>Bylo v roce $day.outTemp.historical_maxtime.format("%Y"):</b></td>    <td><span class="dailystatshigh2">$day.outTemp.historical_max </span></td><!-- AJAX -->
+                                    <td><b>Bylo v roce $day.outTemp.historical_mintime.format("%Y"):</b></td>    <td><span class="dailystatslow2">$day.outTemp.historical_min</span></td><!-- AJAX -->
+                                </tr>
                                 <tr>
                                     <td><b>$obs.label.snapshot_today_avg_wind:</b></td>    <td><span class="dailystatswindavg">$day.wind.avg</span></td><!-- AJAX -->
                                     <td><b>$obs.label.snapshot_today_high_wind:</b></td>        <td><span class="dailystatswindmax">$day.wind.max</span></td><!-- AJAX -->                    
@@ -541,6 +545,7 @@
                                     <td><b>$obs.label.snapshot_month_rain:</b></td>        <td><span class="monthstatsrain">$month.rain.sum</span></td><!-- AJAX -->
                                     <td><b>$obs.label.snapshot_month_rainrate:</b></td>    <td><span class="monthstatsrainrate">$month.rainRate.max</span></td><!-- AJAX -->
                                 </tr>
+								
                             </table>
                         </div>
                     </div>
