@@ -21,12 +21,13 @@ jobs:
           # Používáme sudo, protože do /etc/weewx/bin/user obvykle runner nemůže zapisovat
           # -a: zachová práva, -v: vypíše co dělá, --delete: smaže ve WeeWX to, co jsi smazal v Gitu
           sudo rsync -av /home/runner/weewx-belchertown-new/bin/user/ /etc/weewx/bin/user/
-
+          sudo chown -R weewx:weewx /etc/weewx/skins/Belchertown/
       - name: Copy Skin files (skins/Belchertown)
         run: |
           # Kopírování obsahu složky skinu
           sudo rsync -av --delete /home/runner/weewx-belchertown-new/skins/Belchertown/ /etc/weewx/skins/Belchertown/
-
+          sudo chown -R weewx:weewx /etc/weewx/bin/user/
+          
       - name: Force WeeWX to generate report
         run: |
           sudo weectl report run 
