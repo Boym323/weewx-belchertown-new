@@ -30,3 +30,4 @@ jobs:
       - name: Force WeeWX to generate report
         run: |
           sudo weectl report run 
+          
