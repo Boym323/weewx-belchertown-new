@@ -12,7 +12,7 @@ jobs:
         run: |
           # Přejdeme do složky s repozitářem (uprav cestu, pokud je jinde)
           cd /home/runner/weewx-belchertown-new
-          git pull origin main
+          git pull origin master
 
 
       - name: Copy Python extensions (bin/user)
@@ -30,4 +30,3 @@ jobs:
       - name: Force WeeWX to generate report
         run: |
           sudo weectl report run 
-          
