@@ -2,7 +2,7 @@ name: Deploy to Loucka Proxmox
 
 on:
   push:
-    branches: [ main ]  # Spustí se při každém pushi (i z práce)
+    branches: [ master ]  # Spustí se při každém pushi (i z práce)
 
 jobs:
   deploy:
