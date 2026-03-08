@@ -264,17 +264,19 @@ class getData(SearchList):
             f'referrerpolicy="no-referrer"></img>'
         )
 
-    def _build_windy_radar(self, width, height, lat, lon, zoom, rain, wind, temp, marker):
-        """Build Windy.com embedded radar HTML."""
+def _build_windy_radar(self, width, height, lat, lon, zoom, rain, wind, temp, marker):
+        """Build Windy.com embedded radar HTML with fixed position."""
         marker_str = "true" if marker else "false"
         return (
             f'<iframe width="{width}px" height="{height}px" '
             f'src="https://embed.windy.com/embed2.html?lat={lat}&lon={lon}'
-            f'&zoom={zoom}&level=surface&overlay=radar&menu=&message=true'
+            f'&zoom={zoom}&level=surface&overlay=radar&menu=&message=false' # message=false skryje úvodní bubliny
             f'&marker={marker_str}&calendar=&pressure=&type=map'
             f'&location=coordinates&detail=&detailLat={lat}&detailLon={lon}'
             f'&metricRain={rain}&metricWind={wind}&metricTemp={temp}'
-            f'&radarRange=-1" frameborder="0"></iframe>'
+            f'&radarRange=-1" '
+            f'frameborder="0" '
+            f'title="Windy Radar Loucka"></iframe>' 
         )
 
     def _convert_temperature(self, value, from_unit, formatter):
