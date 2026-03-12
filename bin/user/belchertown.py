@@ -264,7 +264,7 @@ class getData(SearchList):
             f'referrerpolicy="no-referrer"></img>'
         )
 
-def _build_windy_radar(self, width, height, lat, lon, zoom, rain, wind, temp, marker):
+    def _build_windy_radar(self, width, height, lat, lon, zoom, rain, wind, temp, marker):
         """Build Windy.com embedded radar HTML with fixed position."""
         marker_str = "true" if marker else "false"
         return (
