@@ -2020,8 +2020,9 @@ function onMessageArrived(message) {
     var payload_size = message.payloadString.length;
     belchertown_debug("MQTT: [Msg #" + mqtt_message_count + "] Message received - Size: " + payload_size + " bytes, Topic: " + message.destinationName);
     try {
-        update_current_wx(message.payloadString);
+        // Decode each incoming MQTT packet once, then reuse the parsed payload.
         mqtt_payload = jQuery.parseJSON(message.payloadString);
+        update_current_wx(mqtt_payload);
         belchertown_debug("MQTT: [Msg #" + mqtt_message_count + "] Message processed successfully");
     } catch (e) {
         console.error("MQTT: [Msg #" + mqtt_message_count + "] Error processing message: " + e.message);
@@ -2036,7 +2037,10 @@ function refreshHooks() {
 
 // Handle MQTT message
 function update_current_wx(data) {
-    data = jQuery.parseJSON(data);
+    // Keep compatibility with extensions that still call this function with JSON text.
+    if (typeof data === "string") {
+        data = jQuery.parseJSON(data);
+    }
 
     try {
         refreshHooks();
@@ -2277,6 +2281,8 @@ function update_current_wx(data) {
 // #end if
 
 
+// Other pages can omit Highcharts without breaking global initialization.
+if (typeof Highcharts !== "undefined") {
 Highcharts.setOptions({
     global: {
         //useUTC: false
@@ -2291,6 +2297,7 @@ Highcharts.setOptions({
         thousandsSep: "$highcharts_thousands"
     }
 });
+}
 
 function showChart(json_file, prepend_renderTo = false) {
 
