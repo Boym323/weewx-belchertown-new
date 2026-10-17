@@ -2298,6 +2298,9 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
 
         # Final output dict
         output = {}
+        html_dest_dir = os.path.join(
+            self.config_dict["WEEWX_ROOT"], self.skin_dict["HTML_ROOT"], "json"
+        )
 
         # Loop through each [section]. This is the first bracket group of
         # options including global options.
@@ -2313,10 +2316,7 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
             )
 
             # Setup the JSON file name for each chart group
-            html_dest_dir = os.path.join(
-                self.config_dict["WEEWX_ROOT"], self.skin_dict["HTML_ROOT"], "json"
-            )
-            json_filename = html_dest_dir + "/" + chart_group + ".json"
+            json_filename = os.path.join(html_dest_dir, chart_group + ".json")
 
             # Default back to Highcharts standards
             colors = chart_options.get(
@@ -2981,14 +2981,24 @@ class HighchartsJsonGenerator(weewx.reportengine.ReportGenerator):
                         )
                     )
 
-            # Write the output to the JSON file
-            with open(json_filename, mode="w") as jf:
-                jf.write(json.dumps(output[chart_group], indent=4))
+            # Browser consumers do not need pretty-printed chart JSON. Stream
+            # compact JSON directly to avoid a second large temporary string.
+            with open(json_filename, mode="w", encoding="utf-8") as jf:
+                json.dump(output[chart_group], jf, separators=(",", ":"))
 
-            # Save the graphs.conf to a json file for future debugging
-            chart_json_filename = html_dest_dir + "/graphs.json"
-            with open(chart_json_filename, mode="w") as cjf:
-                cjf.write(json.dumps(self.chart_dict, indent=4))
+        # graphs.json is a debugging snapshot of graphs.conf, not a per-group
+        # output. Avoid rewriting it once for every group (or when unchanged).
+        chart_json_filename = os.path.join(html_dest_dir, "graphs.json")
+        if os.path.isdir(html_dest_dir):
+            chart_json_content = json.dumps(self.chart_dict, indent=4)
+            try:
+                with open(chart_json_filename, encoding="utf-8") as cjf:
+                    existing_chart_json = cjf.read()
+            except FileNotFoundError:
+                existing_chart_json = None
+            if existing_chart_json != chart_json_content:
+                with open(chart_json_filename, mode="w", encoding="utf-8") as cjf:
+                    cjf.write(chart_json_content)
 
     def get_observation_data(
         self,

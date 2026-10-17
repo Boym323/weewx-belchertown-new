@@ -1787,6 +1787,14 @@ function forecast_time(i, interval, daytime) {
 
 var mqttConnected = false;
 
+// Replace, rather than repeatedly append, the image cache-buster query key.
+// This retains existing radar/API parameters and keeps URL length bounded.
+function cacheBustImageUrl(src) {
+    const url = new URL(src, document.baseURI);
+    url.searchParams.set('t', Math.floor(Math.random() * 999999999));
+    return url.href;
+}
+
 function ajaximages(section = false, reload_timer_interval_seconds = false) {
     // This function only runs if the elements have an img src.
     // Update images within the specific section
@@ -1794,11 +1802,8 @@ function ajaximages(section = false, reload_timer_interval_seconds = false) {
         belchertown_debug("Updating radar image");
         // Reload images
         if (document.querySelectorAll(".radar-map img").length > 0) {
-            var radar_img = document.querySelectorAll(".radar-map img")[0].src;
-            var new_radar_img = radar_img + "&t=" + Math.floor(Math.random() * 999999999);
-            document.querySelectorAll(".radar-map img")[0].src = new_radar_img;
-            //var radar_html = jQuery('.radar-map').children('img').attr('src').split('?')[0] // Get the img src and remove everything after "?" so we don't stack ?'s onto the image during updates
-            //jQuery('.radar-map').children('img').attr('src', radar_html + "?" + Math.floor(Math.random() * 999999999));
+            const radar_img = document.querySelector(".radar-map img");
+            radar_img.src = cacheBustImageUrl(radar_img.src);
         }
         // Reload iframe - https://stackoverflow.com/a/4249946/1177153
         if (document.querySelectorAll(".radar-map iframe").length > 0) {
@@ -1810,8 +1815,10 @@ function ajaximages(section = false, reload_timer_interval_seconds = false) {
         belchertown_debug("Updating " + section + " images");
         // Reload images
         jQuery('.' + section + ' img').each(function() {
-            new_image_url = jQuery(this).attr('src').split('?')[0] + "?" + Math.floor(Math.random() * 999999999);
-            jQuery(this).attr('src', new_image_url);
+            const imageUrl = jQuery(this).attr('src');
+            if (imageUrl) {
+                jQuery(this).attr('src', cacheBustImageUrl(imageUrl));
+            }
         });
         // Reload iframes
         jQuery('.' + section + ' iframe').each(function() {
@@ -2020,8 +2027,9 @@ function onMessageArrived(message) {
     var payload_size = message.payloadString.length;
     belchertown_debug("MQTT: [Msg #" + mqtt_message_count + "] Message received - Size: " + payload_size + " bytes, Topic: " + message.destinationName);
     try {
-        update_current_wx(message.payloadString);
+        // Decode each incoming MQTT packet once, then reuse the parsed payload.
         mqtt_payload = jQuery.parseJSON(message.payloadString);
+        update_current_wx(mqtt_payload);
         belchertown_debug("MQTT: [Msg #" + mqtt_message_count + "] Message processed successfully");
     } catch (e) {
         console.error("MQTT: [Msg #" + mqtt_message_count + "] Error processing message: " + e.message);
@@ -2036,7 +2044,10 @@ function refreshHooks() {
 
 // Handle MQTT message
 function update_current_wx(data) {
-    data = jQuery.parseJSON(data);
+    // Keep compatibility with extensions that still call this function with JSON text.
+    if (typeof data === "string") {
+        data = jQuery.parseJSON(data);
+    }
 
     try {
         refreshHooks();
@@ -2277,6 +2288,8 @@ function update_current_wx(data) {
 // #end if
 
 
+// Other pages can omit Highcharts without breaking global initialization.
+if (typeof Highcharts !== "undefined") {
 Highcharts.setOptions({
     global: {
         //useUTC: false
@@ -2291,6 +2304,7 @@ Highcharts.setOptions({
         thousandsSep: "$highcharts_thousands"
     }
 });
+}
 
 function showChart(json_file, prepend_renderTo = false) {
 
