@@ -8,7 +8,7 @@
 
 | Priorita | Místo | Původní stav | Změna | Ověření |
 | --- | --- | --- | --- | --- |
-| P0 | `header.html.tmpl` | CSS/JS dostávaly při každém reportu nový `time.time()` query parametr. | Stabilní `asset_version` s ruční invalidací při změně. | Test ověřuje všech pět odkazů. |
+| P0 | `header.html.tmpl` | CSS a Cheetah-generovaný JS dostávaly při každém reportu nový `time.time()` query parametr. | Stabilní `asset_version` jen pro statické CSS; JS dál zůstává reportově verzovaný, protože obsahuje aktuální časové údaje. | Test ověřuje čtyři CSS odkazy a zachování verze generovaného JS. |
 | P1 | `header.html.tmpl` + `belchertown.js.tmpl` | Všechny stránky kromě kiosku načítaly šest modulů Highcharts; globální `setOptions` znemožňoval prosté vypnutí. | Moduly jen na stránce grafů a na domovské stránce s grafy, chráněná inicializace. | Node test se zapnutým i vypnutým Highcharts. |
 | P1 | `header.html.tmpl` | Kvůli prioritě operátorů se Paho načítal na `home` a `pi` i při vypnutém MQTT. | Opraveno seskupení podmínek. | Statický regresní test. |
 | P1 | `belchertown.js.tmpl` | `onMessageArrived` a `update_current_wx` parsovaly tentýž MQTT payload. | Jediné parsování na zprávu; `update_current_wx` dál přijímá i JSON řetězec. | Node test počítá volání parseru a testuje neplatný JSON. |
@@ -18,7 +18,7 @@
 ## Provozní pravidla
 
 1. **Před nasazením:** zaznamenat aktuální SHA, zazálohovat soubory v `/etc/weewx/skins/Belchertown` a `/etc/weewx/bin/user`, provést kontrolu přepsání lokálního `skin.conf`.
-2. **Cache statických souborů:** při změně `*.css`, `js/belchertown.js.tmpl`, nebo konfigurace ovlivňující obsah generovaného JS zvýšit `[Extras] asset_version`. V opačném případě mohou mít klienti starý JS/CSS. Verze se mění **při releasu**, nikoliv při každém vygenerování reportu. V produkci ověřit odlišné URL i `304`/browser-cache hity.
+2. **Cache statických souborů:** při změně `*.css` zvýšit `[Extras] asset_version`. Generovaný `js/belchertown.js.tmpl` obsahuje i aktuální údaje (`$current.dateTime.raw`), proto zatím ponecháváme původní časový parametr na každé vygenerování reportu. JS lze dlouhodobě cachovat až po oddělení dynamické konfigurace. V produkci ověřit cache-hit rate pro CSS.
 3. **Regrese:** ověřit desktop, mobil, kiosk, `/pi`, `/graphs`, `/records`, režimy MQTT zapnuto/vypnuto, světlý/tmavý motiv a webovou konzoli.
 4. **Grafy:** ověřit přesnou shodu datových bodů starého/nového JSON (`JSON.parse`), nezměněný časový rozsah a fungování exportů; nová kompaktní data již nejsou snadno čitelná prostým otevřením souboru.
 5. **Rollback:** revert celého PR a nové vygenerování WeeWX reportu; případně obnovit zálohované soubory. Nesahat na archivní databázi ani na MQTT broker.
