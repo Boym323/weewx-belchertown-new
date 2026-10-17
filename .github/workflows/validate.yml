@@ -1,0 +1,25 @@
+name: Validate Belchertown
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Python syntax
+        run: python3 -m py_compile bin/user/belchertown.py bin/user/tablegenerator.py install.py
+      - name: Validate Python serialization and IO layout
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Validate MQTT behavior and conditional asset loading
+        run: node --test tests/js/*.test.mjs
