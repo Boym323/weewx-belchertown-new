@@ -22,7 +22,7 @@ required to access the service.)
 
 ## Performance and regression testing
 
-The [October 2026 performance audit](docs/performance-audit-2026-10-17.md) documents the first optimization pass and production validation steps. Since CSS and the generated main JavaScript now use a stable `[Extras] asset_version` in `skin.conf`, increment it whenever CSS, JS templates, or configuration affecting the generated JavaScript changes. This avoids forcing a full asset download on every WeeWX report run while keeping cache invalidation explicit.
+The [October 2026 performance audit](docs/performance-audit-2026-10-17.md) documents the first optimization pass and production validation steps. CSS files now use a stable `[Extras] asset_version` in `skin.conf`; increment it when CSS changes. The main generated JavaScript intentionally retains a per-report cache buster because it embeds current observation timestamps and configuration values. Do not cache that script by release alone without separating its dynamic data.
 
 Run offline regression checks with `python3 -m unittest discover -s tests -p 'test_*.py'` and `node --test tests/js/*.test.mjs`. The GitHub pull-request workflow runs these checks automatically; full WeeWX/Cheetah integration still requires a WeeWX installation.
 
