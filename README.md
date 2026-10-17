@@ -20,6 +20,12 @@ required to access the service.)
 
 
 
+## Performance and regression testing
+
+The [October 2026 performance audit](docs/performance-audit-2026-10-17.md) documents the first optimization pass and production validation steps. Since CSS and the generated main JavaScript now use a stable `[Extras] asset_version` in `skin.conf`, increment it whenever CSS, JS templates, or configuration affecting the generated JavaScript changes. This avoids forcing a full asset download on every WeeWX report run while keeping cache invalidation explicit.
+
+Run offline regression checks with `python3 -m unittest discover -s tests -p 'test_*.py'` and `node --test tests/js/*.test.mjs`. The GitHub pull-request workflow runs these checks automatically; full WeeWX/Cheetah integration still requires a WeeWX installation.
+
 ## Documentation, installation, configuration
 
 Full documentation on installation, configuration, the skin's extensive features, and troubleshooting, can be found in the [wiki](https://github.com/uajqq/weewx-belchertown-new/wiki).
