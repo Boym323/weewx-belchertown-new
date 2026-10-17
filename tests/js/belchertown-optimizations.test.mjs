@@ -84,6 +84,27 @@ test('chart initialization runs only when Highcharts is available', () => {
   assert.equal(options.lang.decimalPoint, '.');
 });
 
+test('image refresh preserves API params and does not grow query strings', () => {
+  const image = functionSlice(
+    'function cacheBustImageUrl(src) {',
+    'function ajaximages('
+  );
+  const context = {
+    URL,
+    document: { baseURI: 'https://example.org/weather/index.html' },
+    Math: { random: () => 0.5, floor: Math.floor }
+  };
+  vm.runInNewContext(image, context);
+  const first = context.cacheBustImageUrl('/radar.png?layer=rain&lang=cs#map');
+  const again = context.cacheBustImageUrl(first);
+  const url = new URL(again);
+  assert.equal(url.searchParams.get('layer'), 'rain');
+  assert.equal(url.searchParams.get('lang'), 'cs');
+  assert.equal(url.searchParams.getAll('t').length, 1);
+  assert.equal(url.hash, '#map');
+  assert.equal(first.length, again.length);
+});
+
 test('browser assets use a stable release version and chart scripts are scoped', () => {
   const header = readFileSync('skins/Belchertown/header.html.tmpl', 'utf8');
   const config = readFileSync('skins/Belchertown/skin.conf', 'utf8');
