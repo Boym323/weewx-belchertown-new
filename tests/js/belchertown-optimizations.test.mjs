@@ -87,8 +87,9 @@ test('chart initialization runs only when Highcharts is available', () => {
 test('browser assets use a stable release version and chart scripts are scoped', () => {
   const header = readFileSync('skins/Belchertown/header.html.tmpl', 'utf8');
   const config = readFileSync('skins/Belchertown/skin.conf', 'utf8');
-  assert.ok(!header.includes('int( time.time() )'));
-  assert.equal((header.match(/\?ver=\$Extras\.asset_version/g) || []).length, 5);
+  // CSS is static. belchertown.js is Cheetah-generated with live report data.
+  assert.equal((header.match(/\?ver=\$Extras\.asset_version/g) || []).length, 4);
+  assert.match(header, /js\/belchertown\.js\?\#echo int\( time\.time\(\) \)\#/);
   assert.match(config, /^\s*asset_version\s*=/m);
   assert.match(header, /\$page == "graphs" or \(\$page == "home"/);
   assert.match(header, /\(\$page == "pi" or \$page == "home" or \$page == "kiosk"\) and/);
