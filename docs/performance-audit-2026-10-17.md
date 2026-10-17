@@ -12,6 +12,7 @@
 | P1 | `header.html.tmpl` + `belchertown.js.tmpl` | Všechny stránky kromě kiosku načítaly šest modulů Highcharts; globální `setOptions` znemožňoval prosté vypnutí. | Moduly jen na stránce grafů a na domovské stránce s grafy, chráněná inicializace. | Node test se zapnutým i vypnutým Highcharts. |
 | P1 | `header.html.tmpl` | Kvůli prioritě operátorů se Paho načítal na `home` a `pi` i při vypnutém MQTT. | Opraveno seskupení podmínek. | Statický regresní test. |
 | P1 | `belchertown.js.tmpl` | `onMessageArrived` a `update_current_wx` parsovaly tentýž MQTT payload. | Jediné parsování na zprávu; `update_current_wx` dál přijímá i JSON řetězec. | Node test počítá volání parseru a testuje neplatný JSON. |
+| P1 | `belchertown.js.tmpl` | Obnova radaru přidávala opakovaně další `&t=` do URL, URL se průběžně prodlužovala; u hook obrázků se naopak mazaly původní parametry. | Pomocí `URL.searchParams.set('t', ...)` se mění jediný parametr bez růstu adresy a bez ztráty ostatních parametrů. | Node test stabilní délky, zachování parametrů i fragmentu. |
 | P1 | `belchertown.py` | Ve skupinové smyčce vznikal opakovaný `graphs.json` i bez změny konfigurace. | Jeden přehledný zápis mimo smyčku, pouze pokud se obsah liší. | Strukturální Python test. |
 | P1 | `belchertown.py` | Generované JSON grafů bylo pretty-printed s odsazením 4. | Kompaktní JSON zapisovaný přímo do souboru. | Python test sémantické parity na syntetickém vzorku. |
 
