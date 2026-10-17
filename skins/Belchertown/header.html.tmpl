@@ -118,7 +118,7 @@
     
         #end if
         <script type='text/javascript' src='//stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'></script>
-        <script type='text/javascript' src='$relative_url/js/belchertown.js?ver=$Extras.asset_version'></script>
+        <script type='text/javascript' src='$relative_url/js/belchertown.js?#echo int( time.time() )#'></script>
         #if $page == "pi"
         <script>
             // Set the session variables for the theme
